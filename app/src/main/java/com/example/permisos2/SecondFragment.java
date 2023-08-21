@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,32 +91,18 @@ public class SecondFragment extends Fragment {
 
     private void filterEmployeeList(String query) {
         List<Employee> filteredList = new ArrayList<>();
-
+        String normalizedQuery = normalizeString(query);
 
         for (Employee employee : employeeList) {
             String fullName = employee.getNombre() + " " + employee.getApellidos();
-            String[] names = fullName.toLowerCase().split(" ");
+            String normalizedFullName = normalizeString(fullName);
+            String normalizedNombre = normalizeString(employee.getNombre());
+            String normalizedApellidos = normalizeString(employee.getApellidos());
 
-            boolean singleMatchFound = false;
-
-            String[] queryParts = query.toLowerCase().split(" ");
-            for (String part : queryParts) {
-                boolean partialMatchFound = false;
-                for (String name : names) {
-                    if (name.contains(part)) {
-                        partialMatchFound = true;
-                        singleMatchFound = true;
-                        break;
-                    }
-                }
-
-                if (!partialMatchFound && !(employee.getNombre().toLowerCase().contains(part) || employee.getApellidos().toLowerCase().contains(part))) {
-                    singleMatchFound = false;
-                    break;
-                }
-            }
-
-            if (singleMatchFound || employee.getNlista().toLowerCase().contains(query.toLowerCase())) {
+            if (containsNormalizedWords(normalizedFullName, normalizedQuery) ||
+                    containsNormalizedWords(normalizedNombre, normalizedQuery) ||
+                    containsNormalizedWords(normalizedApellidos, normalizedQuery) ||
+                    normalizeString(employee.getNlista()).contains(normalizedQuery)) {
 
                 filteredList.add(employee);
             }
@@ -123,6 +110,23 @@ public class SecondFragment extends Fragment {
 
         adapter = new EmployeeAdapter(filteredList);
         recyclerView.setAdapter(adapter);
+    }
+
+    private boolean containsNormalizedWords(String text, String query) {
+        String[] words = query.split("\\s+");
+        for (String word : words) {
+            if (!text.contains(word)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private String normalizeString(String input) {
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase();
     }
 
 

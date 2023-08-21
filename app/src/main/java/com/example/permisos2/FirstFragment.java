@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -106,16 +107,27 @@ public class FirstFragment extends Fragment {
 
     private void filterPermisoList(String query) {
         List<Item> filteredList = new ArrayList<>();
+        String normalizedQuery = normalizeString(query);
 
         for (Item item : items) {
-            if (item.getFpermiso().toLowerCase().contains(query.toLowerCase()) ||
-                    item.getNombreEmpleado().toLowerCase().contains(query.toLowerCase()) ||
-                    item.getApellidosEmpleado().toLowerCase().contains(query.toLowerCase())) {
+            String normalizedFpermiso = normalizeString(item.getFpermiso());
+            String normalizedNombreEmpleado = normalizeString(item.getNombreEmpleado());
+            String normalizedApellidosEmpleado = normalizeString(item.getApellidosEmpleado());
+
+            if (normalizedFpermiso.contains(normalizedQuery) ||
+                    normalizedNombreEmpleado.contains(normalizedQuery) ||
+                    normalizedApellidosEmpleado.contains(normalizedQuery)) {
                 filteredList.add(item);
             }
         }
 
         adapter.setItems(filteredList);
+    }
+
+    private String normalizeString(String input) {
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase();
     }
 
 
