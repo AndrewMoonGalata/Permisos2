@@ -1,12 +1,22 @@
 package com.example.permisos2;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,7 +68,76 @@ public class ThirdFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_third, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_third, container, false);
+        /*
+        TextView textUsuario = rootView.findViewById(R.id.txtUsuarioNombre);
+        ImageView imageViewDetalles = rootView.findViewById(R.id.imageViewUser); // Asegúrate de tener el ID correcto para el ImageView
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
+
+        // Obtener los valores almacenados
+        String username = sharedPreferences.getString("username", "");
+        String name = sharedPreferences.getString("nombre", "");
+        String lastname = sharedPreferences.getString("apellido", "");
+        String rol = sharedPreferences.getString("rol", "");
+        boolean rememberMe = sharedPreferences.getBoolean("rememberMe", false);
+        String password = rememberMe ? sharedPreferences.getString("password", "") : "";
+
+
+
+        textUsuario.setText(name+ " - " + lastname);
+*/
+        /*
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String name = bundle.getString("name", "");
+            String lastname = bundle.getString("lastname", "");
+            String username = bundle.getString("username", "");
+            String rol = bundle.getString("rol", "");
+
+
+            textUsuario.setText(name+ " - " + lastname);
+
+            String foto="https://static.vecteezy.com/system/resources/previews/019/879/186/non_2x/user-icon-on-transparent-background-free-png.png";
+            if (!TextUtils.isEmpty(foto)) {
+                String imageUrl =  foto;
+                Glide.with(this)
+                        .load(imageUrl)  // URL de la foto
+                        .error(R.drawable.perfil)  // Aquí se especifica la imagen en caso de error
+                        .into(imageViewDetalles);
+            } else {
+                Glide.with(this)
+                        .load(R.drawable.perfil)  // Carga la imagen predeterminada si imageUrl está vacío
+                        .into(imageViewDetalles);
+            }
+        }
+*/
+        return rootView;
+
+    }
+
+
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Acceder a las SharedPreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
+
+        // Obtener los valores almacenados
+        String username = sharedPreferences.getString("username", "");
+        String name = sharedPreferences.getString("name", "");
+        String lastname = sharedPreferences.getString("lastname", "");
+        String rol = sharedPreferences.getString("rol", "");
+        boolean rememberMe = sharedPreferences.getBoolean("rememberMe", false);
+        String password = rememberMe ? sharedPreferences.getString("password", "") : "";
+
+
+       // TextView textViewLastname = view.findViewById(R.id.textViewLastname);
+        TextView txtUsuarioNombre = view.findViewById(R.id.txtUsuarioNombre);
+
+        txtUsuarioNombre.setText(name +" "+ lastname);
+        // También puedes hacer lo mismo para otras vistas
+
+        // Dependiendo de tus necesidades, puedes usar los valores para diferentes vistas en tu fragmento
     }
 }

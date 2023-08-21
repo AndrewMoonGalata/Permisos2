@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.security.keystore.UserPresenceUnavailableException;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
@@ -26,7 +28,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -66,28 +67,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void guardarCredenciales(String username, String password, boolean rememberMe) {
+    private void guardarCredenciales(String username, String password, String name, String lastname,String rol, Boolean rememberMe) {
         SharedPreferences sharedPreferences = getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("username", username);
+        editor.putString("name", name);
+        editor.putString("lastname", lastname);
+        editor.putString("rol", rol);
         editor.putString("password", rememberMe ? password : "");
         editor.putBoolean("rememberMe", rememberMe);
         editor.apply();
     }
-    public void IniciarSession(View view) {IniciarSession();}
+
+    public void IniciarSession(View view) {
+        IniciarSession();
+    }
 
     private void IniciarSession() {
         String valorusername = inputUsername.getText().toString();
         String valorpassword = inputPassword.getText().toString();
-        boolean rememberMe = checkBoxRememberMe.isChecked();
+
 
         if (valorusername.isEmpty() || valorpassword.isEmpty()) {
             Toast.makeText(context, "LLENE TODOS LOS CAMPOS", Toast.LENGTH_SHORT).show();
         } else {
             Login(valorusername, valorpassword);
-            guardarCredenciales(valorusername,valorpassword,rememberMe);
         }
     }
+
     private void Login(String Username, String Password) {
 
         StringRequest requestLogin = new StringRequest(Request.Method.POST, UrlApiRH, new Response.Listener<String>() {
@@ -106,13 +113,45 @@ public class MainActivity extends AppCompatActivity {
                             // Procesar los datos del JSONArray si es necesario
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                boolean rememberMe = checkBoxRememberMe.isChecked();
+                             String    name = jsonObject.optString("name", "");
+                              String  lastname = jsonObject.optString("lastname", "");
+                               String username = jsonObject.optString("username", "");
+                             String password = jsonObject.optString("username", "");
+                             String rol = jsonObject.optString("rol", "");
+                                Bundle bundle = new Bundle();
+                                bundle.putString("name", name);
+                                bundle.putString("lastname", lastname);
+                                bundle.putString("username", username);
+                                bundle.putString("rol", rol);
+
+                                /*
+                                ThirdFragment usuarioFragment = new ThirdFragment();
+                                usuarioFragment.setArguments(bundle);
+*/
+
+
+                                guardarCredenciales(username, password, name, lastname, rol, rememberMe);
+
+                        //       Toast.makeText(MainActivity.this, "" + bundle, Toast.LENGTH_SHORT).show();
+
+                                if(rol.equals("SUPERADMIN")){
+
+                                    Toast.makeText(MainActivity.this, "Bienvenido Administrador", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(MainActivity.this, Permisos.class);
+                                    startActivity(intent);
+                                    finish();
+                                }else{
+                                    Intent intent = new Intent(MainActivity.this, Permisos.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+
 
                             }
 
-                            // Inicio de sesión exitoso, redirigir a la actividad PrincipalActivity
-                            Intent intent = new Intent(MainActivity.this, Permisos.class);
-                            startActivity(intent);
-                            finish();
+
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();
