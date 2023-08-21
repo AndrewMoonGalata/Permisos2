@@ -1,5 +1,7 @@
 package AddP;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,10 +20,12 @@ import android.widget.ImageButton;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -31,6 +35,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.permisos2.FirstFragment;
 import com.example.permisos2.R;
 
 import org.json.JSONArray;
@@ -49,6 +54,11 @@ public class AddPermiso extends Fragment {
     private List<String> opcionesMotivo = new ArrayList<>();
     private Spinner motivoSpinner;
     private Spinner empleadoSpinner;
+    private Map<String, String> mapaIdEmpleados = new HashMap<>();
+    private Map<String, String> mapaIdMotivos = new HashMap<>();
+
+
+
     private RequestQueue rq;
 
     @Nullable
@@ -98,16 +108,32 @@ public class AddPermiso extends Fragment {
         guardarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Aquí puedes obtener los datos de los diferentes elementos UI
+                // Obtener los datos de los elementos UI
                 String empleadoSeleccionado = empleadoAutoComplete.getText().toString();
                 String motivoSeleccionado = motivoSpinner.getSelectedItem().toString();
                 String fechaSeleccionada = selectedDateEditText.getText().toString();
                 String observaciones = observacionesEditText.getText().toString();
 
-                // Aquí puedes hacer la llamada a tu API con los datos recopilados
-                enviarDatosALaAPI(empleadoSeleccionado, motivoSeleccionado, fechaSeleccionada, observaciones);
+                // Crear un cuadro de diálogo de confirmación
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setMessage("¿Estás seguro de subir el permiso?")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Aquí puedes hacer la llamada a tu API con los datos recopilados
+                                enviarDatosALaAPI(empleadoSeleccionado, motivoSeleccionado, fechaSeleccionada, observaciones);
+                            }
+                        })
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // No hacer nada si se selecciona "Cancelar"
+                            }
+                        });
+
+                // Mostrar el cuadro de diálogo
+                builder.create().show();
             }
         });
+
 
 
 
@@ -152,9 +178,59 @@ public class AddPermiso extends Fragment {
     }
 
     private void enviarDatosALaAPI(String empleado, String motivo, String fecha, String observaciones) {
-        // Aquí puedes implementar la lógica para enviar los datos a la API
-        // Usar Volley o cualquier otra librería para realizar la solicitud HTTP
+        String url = "http://hidalgo.no-ip.info:5610/bitalaapps/controller/ControllerBitala2.php";
+
+        StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // Manejar la respuesta exitosa de la API si es necesario
+                Log.d("AddPermiso", "Respuesta de la API: " + response);
+                Toast.makeText(requireContext(), "Permiso agregado", Toast.LENGTH_SHORT).show();
+
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout, new FirstFragment())
+                        .commit();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Manejar el error de la solicitud a la API si es necesario
+                Log.e("AddPermiso", "Error de la API: " + error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("opcion", "39"); // Cambiar la opción según lo requerido por tu API
+                params.put("idUsuario", "11"); // Valor fijo para idUsuario
+                params.put("idEmpleado", obtenerIdEmpleado(empleado)); // Obtener idEmpleado según el nombre seleccionado
+                params.put("idPermiso", obtenerIdPermiso(motivo)); // Obtener idPermiso según el motivo seleccionado
+                params.put("Fpermiso", fecha);
+                params.put("observaciones", observaciones);
+                // Agregar más parámetros si es necesario
+                return params;
+            }
+        };
+
+        // Agregar la solicitud a la cola de Volley
+        rq.add(request);
     }
+    private String obtenerIdEmpleado(String nombreEmpleado) {
+        String idEmpleado = mapaIdEmpleados.get(nombreEmpleado);
+        Log.d("AddPermiso", "Obtener ID de empleado para " + nombreEmpleado + ": " + idEmpleado);
+        return idEmpleado;
+    }
+
+
+
+
+
+
+    private String obtenerIdPermiso(String motivo) {
+        return mapaIdMotivos.get(motivo);
+    }
+
 
     private void filterEmpleadoAdapter(ArrayAdapter<String> adapter, String query) {
         adapter.getFilter().filter(query);
@@ -208,6 +284,12 @@ public class AddPermiso extends Fragment {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String descripcion = jsonObject.getString("descripcion");
                         opcionesMotivo.add(descripcion);
+
+                        // Obtener el ID del motivo
+                        String idMotivo = jsonObject.getString("id"); // Ajusta el nombre del campo según tu respuesta JSON
+
+                        // Almacenar el ID del motivo en el mapa
+                        mapaIdMotivos.put(descripcion, idMotivo);
                     }
 
                     // Configurar el ArrayAdapter para el Spinner de motivo
@@ -254,6 +336,7 @@ public class AddPermiso extends Fragment {
 
     private void fetchEmpleadoData() {
         String url = "http://hidalgo.no-ip.info:5610/bitalaapps/controller/ControllerBitala2.php";
+        //final Map<String, String> mapaIdEmpleados = new HashMap<>();
 
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -266,6 +349,12 @@ public class AddPermiso extends Fragment {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String empleado = jsonObject.getString("Nombre") + " " + jsonObject.getString("Apellidos");
                         opcionesEmpleados.add(empleado);
+
+                        String idEmpleado = jsonObject.getString("idE");
+                        mapaIdEmpleados.put(empleado, idEmpleado);
+
+                        Log.d("AddPermiso", "Empleado: " + empleado + " - ID: " + idEmpleado);
+
                     }
 
                     // Configurar el ArrayAdapter para el AutoCompleteTextView de empleados
@@ -297,6 +386,7 @@ public class AddPermiso extends Fragment {
         // Agregar la solicitud a la cola de Volley
         rq.add(request);
     }
+
 
 
 }
