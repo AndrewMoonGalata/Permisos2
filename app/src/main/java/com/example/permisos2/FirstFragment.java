@@ -71,6 +71,7 @@ public class FirstFragment extends Fragment {
             }
         });
 
+
         ImageButton datePickerButton = rootView.findViewById(R.id.datePickerButton);
         datePickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,13 +108,17 @@ public class FirstFragment extends Fragment {
         List<Item> filteredList = new ArrayList<>();
 
         for (Item item : items) {
-            if (item.getFpermiso().toLowerCase().contains(query.toLowerCase())) {
+            if (item.getFpermiso().toLowerCase().contains(query.toLowerCase()) ||
+                    item.getNombreEmpleado().toLowerCase().contains(query.toLowerCase()) ||
+                    item.getApellidosEmpleado().toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(item);
             }
         }
 
         adapter.setItems(filteredList);
     }
+
+
 
     private void showDatePicker() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
