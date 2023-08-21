@@ -8,14 +8,17 @@ public class Item {
     String Nlista;
     String Fpermiso;
 
+    String fechaRegistro;
+
     String observaciones;
 
-    public Item(String descripcion, String nombreEmpleado, String apellidosEmpleado, String Nlista, String Fpermiso, String observaciones) {
+    public Item(String descripcion, String nombreEmpleado, String apellidosEmpleado, String Nlista, String Fpermiso, String fechaRegistro, String observaciones) {
         this.descripcion = descripcion;
         this.nombreEmpleado = nombreEmpleado;
         this.apellidosEmpleado = apellidosEmpleado;
         this.Nlista = Nlista;
         this.Fpermiso = Fpermiso;
+        this.fechaRegistro = fechaRegistro;
         this.observaciones = observaciones;
     }
 
@@ -57,6 +60,14 @@ public class Item {
 
     public void setFpermiso(String Fpermiso) {
         this.Fpermiso = Fpermiso;
+    }
+
+    public String getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(String fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 
     public String getObservaciones() {

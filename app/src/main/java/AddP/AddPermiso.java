@@ -208,6 +208,7 @@ public class AddPermiso extends Fragment {
                 params.put("idPermiso", obtenerIdPermiso(motivo)); // Obtener idPermiso según el motivo seleccionado
                 params.put("Fpermiso", fecha);
                 params.put("observaciones", observaciones);
+                params.put("status", "activo");
                 // Agregar más parámetros si es necesario
                 return params;
             }

@@ -17,6 +17,7 @@ public class MyViewHolder extends RecyclerView.ViewHolder {
         empleadoView = itemView.findViewById(R.id.empleado);
         nlistaView = itemView.findViewById(R.id.nlista);
         fechaView = itemView.findViewById(R.id.fecha);
+        fecharView = itemView.findViewById(R.id.fechar);
         // No se usará fecharView en esta vista, así que puedes omitirlo o adaptarlo según necesites.
     }
 }

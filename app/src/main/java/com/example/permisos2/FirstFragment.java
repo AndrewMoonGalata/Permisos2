@@ -177,10 +177,11 @@ public class FirstFragment extends Fragment {
                         String empleado = jsonObject.getString("nombreEmpleado");
                         String apellidos = jsonObject.getString("apellidosEmpleado");
                         String nlista = jsonObject.getString("Nlista");
+                        String fechaRegistro = jsonObject.getString("fechaRegistro");
                         String fecha = jsonObject.getString("Fpermiso");
                         String observaciones = jsonObject.getString("observaciones");
 
-                        Item item = new Item(motivo, empleado,apellidos, nlista, fecha, observaciones);
+                        Item item = new Item(motivo, empleado,apellidos, nlista, fecha, fechaRegistro, observaciones);
                         items.add(item);
                     }
 

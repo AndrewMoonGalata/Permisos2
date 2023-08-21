@@ -41,6 +41,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.empleadoView.setText(item.getNombreEmpleado() + " " + item.getApellidosEmpleado());
         holder.nlistaView.setText(item.getNlista());
         holder.fechaView.setText(item.getFpermiso());
+        holder.fecharView.setText(item.getFechaRegistro());
 
     }
     public void setItems(List<Item> items) {
