@@ -1,7 +1,9 @@
 package AddP;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -57,6 +59,8 @@ public class AddPermiso extends Fragment {
     private Map<String, String> mapaIdEmpleados = new HashMap<>();
     private Map<String, String> mapaIdMotivos = new HashMap<>();
 
+    private static final String PREFS_NAME = "PreferenciaId";
+
 
 
     private RequestQueue rq;
@@ -83,6 +87,8 @@ public class AddPermiso extends Fragment {
 
         Button cancelButton = view.findViewById(R.id.cancelButton);
         Button guardarButton = view.findViewById(R.id.guardarButton);
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("PreferenciaId", Context.MODE_PRIVATE);
 
 
         // Cargar las opciones del AutoCompleteTextView de empleados desde la API en la opción 5
@@ -114,13 +120,18 @@ public class AddPermiso extends Fragment {
                 String fechaSeleccionada = selectedDateEditText.getText().toString();
                 String observaciones = observacionesEditText.getText().toString();
 
+                SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                String idUsuario = sharedPreferences.getString("idUsuario", "");
+
                 // Crear un cuadro de diálogo de confirmación
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                 builder.setMessage("¿Estás seguro de subir el permiso?")
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+
+                                String idUsuario = sharedPreferences.getString("idUsuario", "");
                                 // Aquí puedes hacer la llamada a tu API con los datos recopilados
-                                enviarDatosALaAPI(empleadoSeleccionado, motivoSeleccionado, fechaSeleccionada, observaciones);
+                                enviarDatosALaAPI(empleadoSeleccionado, motivoSeleccionado, fechaSeleccionada, observaciones, idUsuario);
                             }
                         })
                         .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -177,8 +188,13 @@ public class AddPermiso extends Fragment {
         fetchMotivoData(); // Cargar las opciones del Spinner de motivo desde la API en la opción 37
     }
 
-    private void enviarDatosALaAPI(String empleado, String motivo, String fecha, String observaciones) {
+    private void enviarDatosALaAPI(String empleado, String motivo, String fecha, String observaciones, String idUsuario) {
         String url = "http://hidalgo.no-ip.info:5610/bitalaapps/controller/ControllerBitala2.php";
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
+
+        String idusuario = sharedPreferences.getString("idusuario", "");
+
 
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -203,7 +219,7 @@ public class AddPermiso extends Fragment {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("opcion", "39"); // Cambiar la opción según lo requerido por tu API
-                params.put("idUsuario", "11"); // Valor fijo para idUsuario
+                params.put("idUsuario", idusuario);
                 params.put("idEmpleado", obtenerIdEmpleado(empleado)); // Obtener idEmpleado según el nombre seleccionado
                 params.put("idPermiso", obtenerIdPermiso(motivo)); // Obtener idPermiso según el motivo seleccionado
                 params.put("Fpermiso", fecha);
@@ -325,8 +341,8 @@ public class AddPermiso extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("opcion", "37"); // Cambiar la opción según lo requerido por tu API
-                // Agregar más parámetros si es necesario
+                params.put("opcion", "37");
+
                 return params;
             }
         };

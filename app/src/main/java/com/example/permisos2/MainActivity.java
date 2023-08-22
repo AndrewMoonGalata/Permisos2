@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void guardarCredenciales(String username, String password, String name, String lastname,String rol, Boolean rememberMe) {
+    private void guardarCredenciales(String username, String password, String name, String lastname,String rol, Boolean rememberMe, String idusuario) {
         SharedPreferences sharedPreferences = getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("username", username);
@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("rol", rol);
         editor.putString("password", rememberMe ? password : "");
         editor.putBoolean("rememberMe", rememberMe);
+        editor.putString("idusuario", idusuario);
         editor.apply();
     }
 
@@ -118,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
                               String  lastname = jsonObject.optString("lastname", "");
                                String username = jsonObject.optString("username", "");
                              String password = jsonObject.optString("username", "");
-                             String rol = jsonObject.optString("rol", "");
+                                String rol = jsonObject.optString("rol", "");;
+                                String idusuario = jsonObject.optString("idusuario", "");
                                 Bundle bundle = new Bundle();
                                 bundle.putString("name", name);
                                 bundle.putString("lastname", lastname);
@@ -130,8 +132,7 @@ public class MainActivity extends AppCompatActivity {
                                 usuarioFragment.setArguments(bundle);
 */
 
-
-                                guardarCredenciales(username, password, name, lastname, rol, rememberMe);
+                                guardarCredenciales(username, password, name, lastname, rol, rememberMe, idusuario);
 
                         //       Toast.makeText(MainActivity.this, "" + bundle, Toast.LENGTH_SHORT).show();
 
