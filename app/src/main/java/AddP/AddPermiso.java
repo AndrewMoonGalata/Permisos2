@@ -59,6 +59,7 @@ public class AddPermiso extends Fragment {
     private Map<String, String> mapaIdEmpleados = new HashMap<>();
     private Map<String, String> mapaIdMotivos = new HashMap<>();
 
+
     private static final String PREFS_NAME = "PreferenciaId";
 
 

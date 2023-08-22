@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                              String password = jsonObject.optString("username", "");
                                 String rol = jsonObject.optString("rol", "");;
                                 String idusuario = jsonObject.optString("idusuario", "");
+
                                 Bundle bundle = new Bundle();
                                 bundle.putString("name", name);
                                 bundle.putString("lastname", lastname);
