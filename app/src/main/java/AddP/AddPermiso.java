@@ -59,6 +59,7 @@ public class AddPermiso extends Fragment {
     private Map<String, String> mapaIdEmpleados = new HashMap<>();
     private Map<String, String> mapaIdMotivos = new HashMap<>();
 
+    AutoCompleteTextView empleadoAutoComplete;
 
     private static final String PREFS_NAME = "PreferenciaId";
 
@@ -79,7 +80,7 @@ public class AddPermiso extends Fragment {
         rq = Volley.newRequestQueue(requireContext());
 
         motivoSpinner = view.findViewById(R.id.motivoSpinner);
-        AutoCompleteTextView empleadoAutoComplete = view.findViewById(R.id.empleadoAutoComplete);
+        empleadoAutoComplete = view.findViewById(R.id.empleadoAutoComplete);
 
         ImageButton datePickerButton = view.findViewById(R.id.datePicker);
         EditText selectedDateEditText = view.findViewById(R.id.selectedDateEditText);
@@ -396,7 +397,7 @@ public class AddPermiso extends Fragment {
 
                     // Configurar el ArrayAdapter para el AutoCompleteTextView de empleados
                     ArrayAdapter<String> empleadoAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, opcionesEmpleados);
-                    AutoCompleteTextView empleadoAutoComplete = requireView().findViewById(R.id.empleadoAutoComplete);
+                    //AutoCompleteTextView empleadoAutoComplete = requireView().findViewById(R.id.empleadoAutoComplete);
                     empleadoAutoComplete.setAdapter(empleadoAdapter);
 
                 } catch (JSONException e) {
