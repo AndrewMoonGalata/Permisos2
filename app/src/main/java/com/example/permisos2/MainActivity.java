@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.security.keystore.UserPresenceUnavailableException;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("password", rememberMe ? password : "");
         editor.putBoolean("rememberMe", rememberMe);
         editor.putString("idusuario", idusuario);
+        Log.d("onResponse: ",idusuario);
         editor.apply();
     }
 
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                               String  lastname = jsonObject.optString("lastname", "");
                                String username = jsonObject.optString("username", "");
                              String password = jsonObject.optString("username", "");
-                                String rol = jsonObject.optString("rol", "");;
+                                String rol = jsonObject.optString("rol", "");
                                 String idusuario = jsonObject.optString("idusuario", "");
 
                                 Bundle bundle = new Bundle();

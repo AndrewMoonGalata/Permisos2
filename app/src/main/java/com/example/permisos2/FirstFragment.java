@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -21,6 +23,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.permisos2.databinding.ActivityPermisosBinding;
+
 import androidx.appcompat.widget.SearchView;
 
 import org.json.JSONArray;
@@ -47,6 +51,8 @@ public class FirstFragment extends Fragment {
     private Calendar selectedDate = Calendar.getInstance();
 
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_first, container, false);
@@ -54,6 +60,8 @@ public class FirstFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.recyclerview);
         items = new ArrayList<>();
         adapter = new MyAdapter(getChildFragmentManager(), items);
+
+
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
@@ -122,12 +130,26 @@ public class FirstFragment extends Fragment {
         }
 
         adapter.setItems(filteredList);
+
+        TextView noResultsText = getView().findViewById(R.id.noResultsText);
+
+        if (filteredList.isEmpty()) {
+            noResultsText.setVisibility(View.VISIBLE); // Mostrar el mensaje
+        } else {
+            noResultsText.setVisibility(View.GONE); // Ocultar el mensaje
+        }
+
+
     }
 
     private String normalizeString(String input) {
         return Normalizer.normalize(input, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -141,6 +163,14 @@ public class FirstFragment extends Fragment {
                         selectedDate.set(year, monthOfYear, dayOfMonth);
                         // Actualizar la búsqueda con la fecha seleccionada
                         filterPermisoList(getFormattedDate(selectedDate.getTime()));
+
+                        if (adapter.getItemCount() == 0) {
+                            TextView noResultsText = getView().findViewById(R.id.noResultsText);
+                            noResultsText.setText("No se encontraron permisos para esta fecha");
+                            noResultsText.setVisibility(View.VISIBLE); // Mostrar el mensaje
+
+
+                        }
                     }
                 },
                 selectedDate.get(Calendar.YEAR),
@@ -159,7 +189,7 @@ public class FirstFragment extends Fragment {
 
     private void fetchPermisoData() {
         String url = "http://hidalgo.no-ip.info:5610/bitalaapps/controller/ControllerBitala2.php";
-
+        Log.d("FetchPermisoData", "Iniciando solicitud a la API");
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

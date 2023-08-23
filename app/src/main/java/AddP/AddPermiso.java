@@ -91,6 +91,9 @@ public class AddPermiso extends Fragment {
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("PreferenciaId", Context.MODE_PRIVATE);
 
+        SharedPreferences sharedPreference = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
+
+
 
         // Cargar las opciones del AutoCompleteTextView de empleados desde la API en la opción 5
         fetchEmpleadoData();
@@ -134,8 +137,8 @@ public class AddPermiso extends Fragment {
                     return; // Salir del método onClick para evitar seguir con la acción
                 }
 
-                SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                String idUsuario = sharedPreferences.getString("idUsuario", "");
+
+
 
                 // Crear un cuadro de diálogo de confirmación
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -143,8 +146,10 @@ public class AddPermiso extends Fragment {
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
-                                String idUsuario = sharedPreferences.getString("idUsuario", "");
+
                                 // Aquí puedes hacer la llamada a tu API con los datos recopilados
+                                String idUsuario = sharedPreference.getString("idusuario", "");
+
                                 enviarDatosALaAPI(empleadoSeleccionado, motivoSeleccionado, fechaSeleccionada, observaciones, idUsuario);
                             }
                         })
@@ -207,7 +212,7 @@ public class AddPermiso extends Fragment {
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
 
-        String idusuario = sharedPreferences.getString("idusuario", "");
+        //String idsuario = sharedPreferences.getString("idusuario", "");
 
 
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -233,13 +238,14 @@ public class AddPermiso extends Fragment {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("opcion", "39"); // Cambiar la opción según lo requerido por tu API
-                params.put("idUsuario", idusuario);
+                params.put("idUsuario", idUsuario);
                 params.put("idEmpleado", obtenerIdEmpleado(empleado)); // Obtener idEmpleado según el nombre seleccionado
                 params.put("idPermiso", obtenerIdPermiso(motivo)); // Obtener idPermiso según el motivo seleccionado
                 params.put("Fpermiso", fecha);
                 params.put("observaciones", observaciones);
                 params.put("status", "activo");
                 // Agregar más parámetros si es necesario
+                Log.d("getParams: ", params.toString());
                 return params;
             }
         };

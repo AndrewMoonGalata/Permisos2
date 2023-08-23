@@ -76,7 +76,7 @@ public class Permisos extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-
+        replaceFragment(new FirstFragment());
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             switch (item.getItemId()){
