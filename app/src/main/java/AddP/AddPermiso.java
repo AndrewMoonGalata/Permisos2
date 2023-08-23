@@ -109,7 +109,14 @@ public class AddPermiso extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Aquí puedes agregar la lógica para el botón de cancelar si es necesario
+                // Mostrar un mensaje de cancelación
+                Toast.makeText(requireContext(), "El proceso ha sido detenido", Toast.LENGTH_SHORT).show();
+
+                // Cambiar al fragmento FirstFragment
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout, new FirstFragment())
+                        .commit();
             }
         });
         guardarButton.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +127,12 @@ public class AddPermiso extends Fragment {
                 String motivoSeleccionado = motivoSpinner.getSelectedItem().toString();
                 String fechaSeleccionada = selectedDateEditText.getText().toString();
                 String observaciones = observacionesEditText.getText().toString();
+
+                if (empleadoSeleccionado.isEmpty() || motivoSeleccionado.isEmpty() || fechaSeleccionada.isEmpty() || observaciones.isEmpty()) {
+                    // Mostrar un mensaje de error si algún campo obligatorio está vacío
+                    Toast.makeText(requireContext(), "Faltan campos por completar", Toast.LENGTH_SHORT).show();
+                    return; // Salir del método onClick para evitar seguir con la acción
+                }
 
                 SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 String idUsuario = sharedPreferences.getString("idUsuario", "");
