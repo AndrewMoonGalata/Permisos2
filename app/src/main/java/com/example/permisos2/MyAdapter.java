@@ -94,6 +94,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             args.putString("empleado", item.getNombreEmpleado() + " " + item.getApellidosEmpleado());
             args.putString("nlista", item.getNlista());
             args.putString("fecha", item.getFpermiso());
+            args.putString("fechar", item.getFechaRegistro());
             args.putString("observaciones", item.getObservaciones());
 
             dialogFragment.setArguments(args);
