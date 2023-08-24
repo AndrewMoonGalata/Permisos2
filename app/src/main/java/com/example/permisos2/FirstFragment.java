@@ -1,6 +1,8 @@
 package com.example.permisos2;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -97,7 +99,7 @@ public class FirstFragment extends Fragment {
                 openAddPermisoFragment();
             }
         });
-
+        Log.d("FirstFragment", "Fetching permisos data...");
         // Realizar la solicitud a la API
         fetchPermisoData();
 
@@ -190,6 +192,13 @@ public class FirstFragment extends Fragment {
     private void fetchPermisoData() {
         String url = "http://hidalgo.no-ip.info:5610/bitalaapps/controller/ControllerBitala2.php";
         Log.d("FetchPermisoData", "Iniciando solicitud a la API");
+        //agregué esto, si deja de funcionar retirarlo
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE);
+        String idUsuario = sharedPreferences.getString("idusuario", ""); // Obtener el idusuario del usuario que ha iniciado sesión
+        Log.d("FetchPermisoData", "ID de Usuario: " + idUsuario);
+
+        //
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -200,8 +209,26 @@ public class FirstFragment extends Fragment {
                     // Limpiar la lista actual de elementos
                     items.clear();
 
-                    // Iterar a través del JSONArray y agregar los elementos a la lista
                     for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String userId = jsonObject.getString("idUsuario"); // Obtener el idusuario asociado con el permiso
+
+                        if (userId.equals(idUsuario)) { // Verificar si el idusuario coincide con el del usuario que ha iniciado sesión
+                            String motivo = jsonObject.getString("descripcion");
+                            String empleado = jsonObject.getString("nombreEmpleado");
+                            String apellidos = jsonObject.getString("apellidosEmpleado");
+                            String nlista = jsonObject.getString("Nlista");
+                            String fechaRegistro = jsonObject.getString("fechaRegistro");
+                            String fecha = jsonObject.getString("Fpermiso");
+                            String observaciones = jsonObject.getString("observaciones");
+
+                            Item item = new Item(motivo, empleado, apellidos, nlista, fecha, fechaRegistro, observaciones);
+                            items.add(item);
+                        }
+                    }
+
+                    // for original si deja de jalar el de arriba, reestablecer éste
+                    /*for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String motivo = jsonObject.getString("descripcion");
                         String empleado = jsonObject.getString("nombreEmpleado");
@@ -213,7 +240,7 @@ public class FirstFragment extends Fragment {
 
                         Item item = new Item(motivo, empleado,apellidos, nlista, fecha, fechaRegistro, observaciones);
                         items.add(item);
-                    }
+                    }*/
 
                     // Notificar al adaptador que los datos han cambiado
                     adapter.notifyDataSetChanged();
@@ -237,6 +264,7 @@ public class FirstFragment extends Fragment {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("opcion", "38");
+                params.put("idusuario", idUsuario); // Agregar el idusuario a los parámetros de la solicitud
                 // Agregar más parámetros si es necesario
                 return params;
             }
